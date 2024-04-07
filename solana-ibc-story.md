@@ -464,10 +464,12 @@ size’ section](#getting-heap-size).  Specifically:
 
 Importantly, to perform the verification the code needs the
 Instructions account.  Unfortunately, `ibc-rs` effectively assumes
-that signature verification code is stateless (strictly speaking the
-assumption is in `tendermint` but the end result is the same).
-There’s no way to pass that Instructions account down to place where
-`ibc-rs` needs to perform the verification.
+that signature verification code is stateless (specifically the
+assumption is in [`tendermint`’s `Verifier`
+trait](https://docs.rs/tendermint/0.34.1/tendermint/crypto/signature/trait.Verifier.html)
+but the end result for us is the same).  There’s no way to pass that
+Instructions account down to place where `ibc-rs` needs to perform the
+verification.
 
 The obvious solution is to use global variables.  Figure out the data
 needed for signature verification at the start of the smart contract,
