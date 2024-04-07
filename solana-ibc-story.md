@@ -58,7 +58,7 @@ macro](https://docs.rs/solana-program/latest/solana_program/macro.msg.html).
 It supports normal Rust formatting but it’s behaviour is radically
 different depending on number of arguments passed to it.  When invoked
 with a single argument, it is logged directly with no formatting;
-otherwise arguments are passed to Rust’s `format!` macro and result is
+otherwise arguments are passed to Rust’s `format` macro and result is
 logged.  It means that the following code won’t do what one might
 expect:
 
@@ -71,7 +71,7 @@ solana_program::msg!("Oh, hi {name}.");
 That’s not the part that is a trap.
 
 The default Solana allocator (the one declared by [Solana’s
-`entrypoint!`](https://docs.rs/solana-program/latest/solana_program/macro.entrypoint.html)
+`entrypoint`](https://docs.rs/solana-program/latest/solana_program/macro.entrypoint.html)
 or [Anchor’s
 `program`](https://docs.rs/anchor-lang/latest/anchor_lang/attr.program.html)
 macro) doesn’t free memory.  When logging a formatted message, the
