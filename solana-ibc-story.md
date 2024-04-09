@@ -275,7 +275,7 @@ In the `BumpAllocator` presented above, this corresponds to the use of the
 
 ### <a name="getting-heap-size"></a> Getting heap size
 
-Getting the heap size shouldn’t be a big problem.  Right?  One would hope to simply figure out the size
+Eliminating the hard-coded heap size shouldn’t be a big problem.  Right?  One would hope to simply figure out the size
 of the heap and use that in the allocator instead of assuming the
 `HEAP_LENGTH` constant.  In their infinite wisdom, Solana maintainers
 [decided not to offer a syscall to get that
