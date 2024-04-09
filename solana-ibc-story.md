@@ -31,7 +31,7 @@ to perform an IBC handshake when establishing an IBC connection.  This is
 why we’ve ended up creating [the guest
 blockchain](https://docs.picasso.network/technology/ibc/solana/#ibc-requirements--the-need-for-a-guest-blockchain)
 which runs atop Solana.  While an interesting topic by itself, this post
-is not about the guest blockchain, as the guest blockchain has been detailed [here](https://research.composable.finance/t/crossing-the-cross-blockchain-interoperability-chasm/33).
+is not about the guest blockchain, as it has been detailed [here](https://research.composable.finance/t/crossing-the-cross-blockchain-interoperability-chasm/33).
 
 Instead, this post describes the technical difficulties of developing a complex smart
 contract on Solana.  IBC is as complex as it gets.  This is especially
