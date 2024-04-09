@@ -151,11 +151,6 @@ mod alloc {
         }
 
         unsafe fn dealloc(&self, ptr: *mut u8, layout: core::alloc::Layout) {
-            // Free the memory if the allocation is adjacent to the unallocated
-            // range.  This will handle freeing the last performed allocation as
-            // well as freeing memory in LIFO order so long as each allocation
-            // size matches its alignment.  If we cannot perform the match than
-            // just leak memory.
             let ptr = ptr as usize;
             let end = self.free_end().unwrap_or(0);
             if cfg!(debug_assertions) {
@@ -170,6 +165,11 @@ mod alloc {
                             layout.size());
                 }
             }
+            // Free the memory if the allocation is adjacent to the unallocated
+            // range.  This will handle freeing the last performed allocation as
+            // well as freeing memory in LIFO order so long as each allocation
+            // size matches its alignment.  If we cannot perform the match than
+            // just leak memory.
             if ptr == end {
                 self.set_free_end(ptr + layout.size());
             }
@@ -233,6 +233,7 @@ In the end, naïve opportunistic deallocation algorithm as presented
 above wasn’t sufficient for Solana IBC.  We had to bring in the big
 guns,
 i.e. [`ComputeBudgetInstruction::RequestHeapFrame`](https://docs.rs/solana-sdk/latest/solana_sdk/compute_budget/enum.ComputeBudgetInstruction.html#variant.RequestHeapFrame).
+
 The initial instructions of a Solana transaction may call the [Compute
 Budget program](https://solana.com/docs/core/runtime#compute-budget).
 They act as configuration of the limits taking effect while execution
@@ -254,11 +255,12 @@ pub fn process_instruction(
 }
 ```
 
-All it does is allocate 40 KB buffer which is larger than default heap
-size.  However, when executing a transaction consisting of two
-instructions: the first calling the Compute Budget program with
-`RequestHeapFrame(102400)` instruction and the second calling the
-above test program, the program will… fail just as before.
+It does is allocate 40 KB buffer which is larger than default heap
+size.  Therefore executing it as is in a transaction fails.  However,
+when executing a transaction consisting of two instructions: the first
+calling the Compute Budget program with `RequestHeapFrame(102400)`
+operation and the second calling the above test program, the program…
+fails just as before.
 
 Even though higher heap is requested, Solana program will have access
 to the first 32 KiB only.  Well, sort of.  Turns out the default
@@ -463,23 +465,20 @@ size’ section](#getting-heap-size).  Specifically:
    verified.
 
 Importantly, to perform the verification the code needs the
-Instructions account.  Unfortunately, `ibc-rs` effectively assumes
-that signature verification code is stateless (specifically the
-assumption is in [`tendermint`’s `Verifier`
-trait](https://docs.rs/tendermint/0.34.1/tendermint/crypto/signature/trait.Verifier.html)
-but the end result for us is the same).  There’s no way to pass that
-Instructions account down to place where `ibc-rs` needs to perform the
-verification.
+Instructions account.  Unfortunately, Tendermint light client
+effectively assumes that signature verification code is stateless
+(specifically the assumption is in [`Verifier`
+trait](https://docs.rs/tendermint/0.34.1/tendermint/crypto/signature/trait.Verifier.html)).
+There’s no way to pass that Instructions account down to place where
+the light client needs to perform the verification.
 
 The obvious solution is to use global variables.  Figure out the data
 needed for signature verification at the start of the smart contract,
-save it in a static variable and add custom
-[`tendermint::crypto::signature::Verifier`](https://docs.rs/tendermint/latest/tendermint/crypto/signature/trait.Verifier.html)
-implementation which accesses that global state.  Except, of course,
-this is not possible on Solana because mutable global state is not
-allowed.  Fortunately, since we’ve already used our own global
-allocator, the solution to this problem turned out to be relatively
-simple.
+save it in a static variable and add custom `Verifier` implementation
+which accesses that global state.  Except, of course, this is not
+possible on Solana because mutable global state is not allowed.
+Fortunately, since we’ve already used our own global allocator, the
+solution to this problem turned out to be relatively simple.
 
 ### Using global allocator to store mutable global state
 
