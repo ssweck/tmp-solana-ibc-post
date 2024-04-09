@@ -605,7 +605,7 @@ complicated by forcing another version of the code for non-Solana
 builds (e.g. tests).  Another aspect which makes things interesting is
 Solana’s lack of support for atomic operations (e.g. [`AtomicPtr`
 type](https://doc.rust-lang.org/core/sync/atomic/struct.AtomicPtr.html)).
-The mere existence of them on Solana, even if they are never executed, causes the
+The mere existence of them in the smart contract, even if they are dead code, causes the
 smart contract to fail validation before uploading to the blockchain.
 
 Fortunately, all of this can be ignored if the global state isn’t used by
