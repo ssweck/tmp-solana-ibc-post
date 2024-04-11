@@ -411,7 +411,7 @@ Fortunately, all of this can be ignored if the global state isn’t used by any 
 
 # Conclusion
 
-
+Dealing with Solana memory turned out to be quite a challenge on its own.  However, that wasn’t all of the adventures we had with the Solana IBC implementation.  Then again, this post has been going for long enough.  The rest of the story will be told in an upcoming part 2.
 
 ________________
 
